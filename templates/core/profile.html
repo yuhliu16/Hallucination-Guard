@@ -1,0 +1,240 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Your Profile{% endblock title %}
+{% block head_extra %}
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>{% endblock %}
+{% block content %}
+	<div class="container mt-4">
+		<div class="row">
+			<div class="col-9">
+				<form method="POST" class="mb-3">
+					{% csrf_token %}
+					<div class="mb-3">
+						<label for="balance" class="form-label mb-0">Add Balance</label>
+						<div class="input-group">
+							<input type="number" id="balance" name="balance" class="form-control" min="1" required>
+							<button type="submit" class="btn btn-outline-primary input-group-append">Add Balance</button>
+						</div>
+					</div>
+				</form>
+				<!-- My Reviews -->
+				<label>My Reviews</label>
+				{% if my_reviews %}
+					<ul class="list-group mb-3">
+						{% for rev in my_reviews %}
+							<li class="list-group-item" onclick="location.href='{% url 'review_detail' rev.id %}'">
+								<div class="profile-review-header">
+									<strong>Response from {{ rev.ai_response.model }}</strong>
+									<div class="d-flex justify-content-between">
+										<p class="grey-info">{{ rev.get_status_display }}</p>
+										<p class="grey-info">{{ rev.created_at|date:"Y-m-d H:i" }}</p>
+									</div>
+								</div>
+								<label>Judgment</label>
+								{% if rev.is_hallucination %}
+									<p class="mb-2">Model hallucinated</p>
+									{% else %}
+									<p class="mb-2">Model is correct</p>
+								{% endif %}
+								<label>Justification</label>
+								<p class="mb-2">{{ rev.justification }}</p>
+								{% if rev.is_hallucination %}
+									<label>Correction</label>
+									<p class="mb-2">{{ rev.correction }}</p>
+								{% endif %}
+							</li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p>No reviews found.</p>
+				{% endif %}
+
+				<!-- My Confirmed Reviews -->
+				<label>Reviews I Confirmed</label>
+				{% if my_confirmed_reviews %}
+					<ul class="list-group mb-3">
+						{% for rev in my_confirmed_reviews %}
+							<li class="list-group-item" onclick="location.href='{% url 'review_detail' rev.id %}'">
+								<div class="profile-review-header">
+									<strong>Response from {{ rev.ai_response.model }}</strong>
+									<div class="d-flex justify-content-between">
+										<p class="grey-info">{{ rev.get_status_display }}</p>
+										<p class="grey-info">{{ rev.created_at|date:"Y-m-d H:i" }}</p>
+									</div>
+								</div>
+								<label>Judgment</label>
+								{% if rev.is_hallucination %}
+									<p class="mb-2">Model hallucinated</p>
+									{% else %}
+									<p class="mb-2">Model is correct</p>
+								{% endif %}
+								<label>Justification</label>
+								<p class="mb-2">{{ rev.justification }}</p>
+								{% if rev.is_hallucination %}
+									<label>Correction</label>
+									<p class="mb-2">{{ rev.correction }}</p>
+								{% endif %}
+							</li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p>No reviews confirmed by you.</p>
+				{% endif %}
+				<hr>
+				<!-- Debates where I'm the challenger -->
+				<label>My Debates (Challenger)</label>
+				{% if my_challenged_debates %}
+					<ul class="list-group mb-3">
+						{% for deb in my_challenged_debates %}
+							<li class="list-group-item" onclick="location.href='{% url 'debate_detail' deb.id %}'">
+								<div class="profile-review-header">
+									<strong>Response from {{ deb.ai_response.model }}</strong>
+									<div class="d-flex justify-content-between">
+										<p class="grey-info">{% if deb.resolved %}Debate Resolved{% else %}Debate Ongoing{% endif %}</p>
+										<p class="grey-info">{{ deb.created_at|date:"Y-m-d H:i" }}</p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col">
+										<label>Defender's Judgment</label>
+										{% if deb.challenged_review.is_hallucination %}
+											<p class="mb-2">Model hallucinated</p>
+										{% else %}
+											<p class="mb-2">Model is correct</p>
+										{% endif %}
+										<label>Defender's Justification</label>
+										<p class="mb-2">{{ deb.challenged_review.justification }}</p>
+										{% if deb.challenged_review.is_hallucination %}
+											<label>Defender's Correction</label>
+											<p class="mb-2">{{ deb.challenged_review.correction }}</p>
+										{% endif %}
+									</div>
+									<div class="col">
+										<label>My Judgment</label>
+										{% if deb.is_hallucination %}
+											<p class="mb-2">Model hallucinated</p>
+										{% else %}
+											<p class="mb-2">Model is correct</p>
+										{% endif %}
+										<label>My Justification</label>
+										<p class="mb-2">{{ deb.justification }}</p>
+										{% if deb.is_hallucination %}
+											<label>My Correction</label>
+											<p class="mb-2">{{ deb.correction }}</p>
+										{% endif %}
+									</div>
+								</div>
+							</li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p>You haven't challenged any reviews.</p>
+				{% endif %}
+
+				<!-- Debates where I'm the original reviewer of the challenged review -->
+				<label>My Debates (Defender)</label>
+				{% if my_defended_debates %}
+					<ul class="list-group mb-3">
+						{% for deb in my_defended_debates %}
+							<li class="list-group-item" onclick="location.href='{% url 'debate_detail' deb.id %}'">
+								<div class="profile-review-header">
+									<strong>Response from {{ deb.ai_response.model }}</strong>
+									<div class="d-flex justify-content-between">
+										<p class="grey-info">{% if deb.resolved %}Debate Resolved{% else %}Debate Ongoing{% endif %}</p>
+										<p class="grey-info">{{ deb.created_at|date:"Y-m-d H:i" }}</p>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col">
+										<label>My Judgment</label>
+										{% if deb.challenged_review.is_hallucination %}
+											<p class="mb-2">Model hallucinated</p>
+										{% else %}
+											<p class="mb-2">Model is correct</p>
+										{% endif %}
+										<label>My Justification</label>
+										<p class="mb-2">{{ deb.challenged_review.justification }}</p>
+										{% if deb.challenged_review.is_hallucination %}
+											<label>My Correction</label>
+											<p class="mb-2">{{ deb.challenged_review.correction }}</p>
+										{% endif %}
+									</div>
+									<div class="col">
+										<label>Challenger's Judgment</label>
+										{% if deb.is_hallucination %}
+											<p class="mb-2">Model hallucinated</p>
+										{% else %}
+											<p class="mb-2">Model is correct</p>
+										{% endif %}
+										<label>Challenger's Justification</label>
+										<p class="mb-2">{{ deb.justification }}</p>
+										{% if deb.is_hallucination %}
+											<label>Challenger's Correction</label>
+											<p class="mb-2">{{ deb.correction }}</p>
+										{% endif %}
+									</div>
+								</div>
+							</li>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p>No one has challenged your reviews.</p>
+				{% endif %}
+			</div>
+			<div class="col-3">
+				<div id="walletChartContainer">
+					<canvas id="walletChart"></canvas>
+				</div>
+				<script>
+                    const realBalance = {{ wallet.balance|default_if_none:0 }};
+                    const realOnHold = {{ wallet.on_hold|default_if_none:0 }};
+
+                    let dataArray = [realBalance, realOnHold];
+                    let showPlaceholder = false;
+
+                    // If both are zero, pass 0.1 so the chart draws a small slice
+                    if (realBalance === 0 && realOnHold === 0) {
+                        dataArray = [0.1, 0];
+                        showPlaceholder = true;
+                    }
+
+                    const ctx = document.getElementById('walletChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Balance', 'On Hold'],
+                            datasets: [{
+                                data: dataArray,
+								backgroundColor: [
+                                'rgba(84,179,46,0.65)',
+                                'rgb(213,220,237)',
+                            ],
+                            hoverOffset: 4,
+                            }]
+                        },
+                        options: {
+                            plugins: {
+                                // Overwrite the tooltip label
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            // If we're in placeholder mode, always display "0" instead of 0.1
+                                            if (showPlaceholder) {
+                                                return context.label + ': 0';
+                                            }
+                                            // Otherwise, default to the actual value
+                                            return context.label + ': ' + context.formattedValue;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+				</script>
+
+			</div>
+		</div>
+
+	</div>
+{% endblock content %}

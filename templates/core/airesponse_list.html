@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Unreviewed Responses{% endblock title %}
+
+{% block content %}
+	<div class="container mt-4">
+	{% if ai_responses %}
+		<div class="list-group">
+			{% for ai in ai_responses %}
+				<a href="{% url 'airesponse_detail' ai.pk %}" class="list-group-item list-group-item-action">
+					<div class="d-flex w-100 justify-content-between">
+						<h5 class="mb-1">Response from {{ ai.model }}</h5>
+						<small class="text-muted">{{ ai.created_at|date:"Y-m-d" }}</small>
+					</div>
+					<p class="potential-gain"><i class="fa-solid fa-coins"></i> {{ ai.get_first_share }}</p>
+				</a>
+			{% endfor %}
+		</div>
+	{% else %}
+		<p>No AI responses found.</p>
+	{% endif %}
+	</div>
+{% endblock content %}

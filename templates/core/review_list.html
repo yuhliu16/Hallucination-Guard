@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Open AI Responses{% endblock title %}
+
+{% block content %}
+	<div class="container mt-4">
+		{% if reviews %}
+			<div class="list-group">
+				{% for review in reviews %}
+					<a href="{% url 'review_detail' review.pk %}" class="list-group-item list-group-item-action">
+						<div class="d-flex w-100 justify-content-between">
+							<h5 class="mb-1">Response from {{ review.ai_response.model }}</h5>
+							<small class="text-muted">{{ review.ai_response.created_at|date:"Y-m-d" }}</small>
+						</div>
+						<div class="d-flex w-100 justify-content-between">
+							<p class="potential-gain"><i class="fa-solid fa-coins"></i> {{ review.ai_response.get_confirm_share }}
+								~ {{ review.get_current_pot }}</p>
+							{% if review.is_hallucination %}
+								<span class="badge text-bg-danger h-100">Model hallucinated</span>
+							{% else %}
+								<span class="badge text-bg-success h-100">Model is correct</span>
+							{% endif %}
+						</div>
+					</a>
+				{% endfor %}
+			</div>
+		{% else %}
+			<p>No reviews found.</p>
+		{% endif %}
+	</div>
+
+{% endblock content %}

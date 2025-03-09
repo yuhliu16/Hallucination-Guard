@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Challenge Review{% endblock title %}
+
+{% block content %}
+	{% with ai_response=debate.ai_response review=debate.challenged_review %}
+		<div class="container mt-4">
+			{% include 'core/components/model_response.html' %}
+			<hr>
+			<div class="d-flex">
+				<div class="judgment-left">
+					<h6>Submitted Judgement 1</h6>
+					{% with judgement=debate.challenged_review  %}
+						{% include 'core/components/judgement_container.html' %}
+					{% endwith %}
+					{% if debate.challenged_review.reviewer != request.user and debate.challenger != request.user %}
+						<form method="POST" class="my-3">
+							{% csrf_token %}
+							<input name="vote" hidden value="2">
+							<button type="submit" class="btn btn-primary">Vote for Judgement 1</button>
+						</form>
+					{% endif %}
+				</div>
+				<div class="judgment-right">
+					<h6>Submitted Judgement 2</h6>
+					{% with judgement=debate %}
+						{% include 'core/components/judgement_container.html' %}
+					{% endwith %}
+					{% if debate.challenged_review.reviewer != request.user and debate.challenger != request.user %}
+						<form method="POST" class="my-3">
+							{% csrf_token %}
+							<input name="vote" hidden value="2">
+							<button type="submit" class="btn btn-primary">Vote for Judgement 2</button>
+						</form>
+					{% endif %}
+				</div>
+			</div>
+
+		</div>
+	{% endwith %}
+	<script>
+        $('#is_confirmed').on('change', function () {
+            if ($(this).val() === 'false') {
+                $('.show-on-challenge').show();
+                $('.show-on-confirm').hide();
+            } else {
+                $('.show-on-challenge').hide();
+                $('.show-on-confirm').show();
+            }
+        })
+	</script>
+{% endblock content %}

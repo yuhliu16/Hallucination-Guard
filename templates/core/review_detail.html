@@ -1,0 +1,81 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Challenge Review{% endblock title %}
+
+{% block content %}
+	{% with ai_response=review.ai_response %}
+		<div class="detail-container">
+			<div class="detail-left">
+				<p class="potential-gain"><i class="fa-solid fa-coins"></i> <strong>
+					{{ ai_response.get_confirm_share }} ~
+					{{ review.get_current_pot }} tokens</strong>
+				</p>
+				{% include 'core/components/model_response.html' %}
+				<hr>
+				<h6>Submitted Judgement</h6>
+				{% with judgement=review %}
+					{% include 'core/components/judgement_container.html' %}
+				{% endwith %}
+			</div>
+			{% if request.user not in review.confirmed_by.all and request.user != review.reviewer %}
+				<div class="detail-right">
+					<form method="POST" class="mb-3">
+						{% csrf_token %}
+						<div class="mb-3">
+							<label for="is_confirmed" class="form-label">Is the judgment correct?</label>
+							<select id="is_confirmed" name="is_confirmed" class="form-select" required>
+								<option value="" disabled selected hidden></option>
+								<option value="true">Yes, I confirm the reviewer's judgment</option>
+								<option value="false">No, I challenge the reviewer</option>
+							</select>
+						</div>
+
+						<div class="mb-3 show-on-challenge" style="display: none">
+							<label for="is_hallucination" class="form-label">Is this a hallucination?</label>
+							<select id="is_hallucination" name="is_hallucination" class="form-select">
+								<option value="" disabled selected hidden></option>
+								<option value="true">Yes (Model Hallucinated)</option>
+								<option value="false">No (Model is Correct)</option>
+							</select>
+						</div>
+
+						<div class="mb-3">
+							<label for="justification" class="form-label mb-0">Justification</label>
+							<p class="grey-info">In a few words, explain why you think the reviewer made a good or bad
+								judgment.</p>
+							<textarea id="justification" name="justification" class="form-control" rows="4"
+									  required></textarea>
+						</div>
+						<div id="correction-container" class="mb-3 show-on-challenge" style="display: none">
+							<label for="correction" class="form-label mb-0">Correction</label>
+							<p class="grey-info">Please enter the corrected model response by changing minimum
+								content.</p>
+							<textarea id="correction" name="correction" class="form-control"
+									  rows="4">{{ ai_response.answer }}</textarea>
+						</div>
+						<p class="grey-info show-on-challenge" style="display: none">{{ review.get_current_pot }} tokens
+							will be put on hold. You will double it if you win the debate after challenge.</p>
+						<p class="grey-info show-on-confirm">You will receive {{ ai_response.get_confirm_share }} tokens
+							when the review is settled.</p>
+						<button id="confirm-review" type="submit" class="btn btn-primary show-on-confirm">Confirm
+						</button>
+						<button id="challenge-review" type="submit" class="btn btn-danger show-on-challenge"
+								style="display: none">Challenge
+						</button>
+					</form>
+				</div>
+			{% endif %}
+		</div>
+	{% endwith %}
+	<script>
+        $('#is_confirmed').on('change', function () {
+            if ($(this).val() === 'false') {
+                $('.show-on-challenge').show();
+                $('.show-on-confirm').hide();
+            } else {
+                $('.show-on-challenge').hide();
+                $('.show-on-confirm').show();
+            }
+        })
+	</script>
+{% endblock content %}

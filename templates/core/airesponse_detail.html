@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}AI Response Detail{% endblock title %}
+
+{% block content %}
+	<div class="detail-container">
+		<div class="detail-left">
+			<p class="potential-gain"><i class="fa-solid fa-coins"></i> <strong>
+				{{ ai_response.get_first_share }} tokens</strong></p>
+			{% include 'core/components/model_response.html' %}
+		</div>
+		<div class="detail-right">
+			<form method="POST" class="mb-3" action="{% url 'submit_review' ai_response.id %}">
+				{% csrf_token %}
+				<div class="mb-3">
+					<label for="is_hallucination" class="form-label">Is this a hallucination?</label>
+					<select id="is_hallucination" name="is_hallucination" class="form-select" required>
+						<option value="" disabled selected hidden></option>
+						<option value="true">Yes (Model Hallucinated)</option>
+						<option value="false">No (Model is Correct)</option>
+					</select>
+				</div>
+
+				<div class="mb-3">
+					<label for="justification" class="form-label mb-0">Justification</label>
+					<p class="grey-info">Please refer to the model's response for your justification and provide
+						evidence as detail as possible.</p>
+					<textarea id="justification" name="justification" class="form-control" rows="4" required></textarea>
+				</div>
+
+				<div id="correction-container" class="mb-3" style="display: none">
+					<label for="correction" class="form-label mb-0">Correction</label>
+					<p class="grey-info">Please enter the corrected model response by changing minimum content.</p>
+					<textarea id="correction" name="correction" class="form-control"
+							  rows="4">{{ ai_response.answer }}</textarea>
+				</div>
+				<p class="grey-info">You'll need to put {{ ai_response.get_first_share }} tokens on hold to submit this review. Your tokens will be unlocked if the review is confirmed without failing a challenge, and you'll receive an extra 30.</p>
+				<button type="submit" class="btn btn-primary">Submit Review</button>
+			</form>
+		</div>
+	</div>
+
+
+	<script>
+        $('#is_hallucination').on('change', function () {
+            if ($(this).val() === 'true') {
+                $('#correction-container').show();
+            } else {
+                $('#correction-container').hide();
+            }
+        })
+	</script>
+{% endblock content %}

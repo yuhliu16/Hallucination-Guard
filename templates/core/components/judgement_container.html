@@ -1,0 +1,14 @@
+<div class="previous-review-container">
+	<label>Is this a hallucination?</label>
+	{% if judgement.is_hallucination %}
+		<p class="mb-0">Yes, the model hallucinated</p>
+	{% else %}
+		<p class="mb-0">No, the model is correct</p>
+	{% endif %}
+	<label>Justification</label>
+	<div>{{ judgement.justification }}</div>
+	{% if judgement.is_hallucination %}
+		<label>Correction</label>
+		<div>{{ judgement.correction }}</div>
+	{% endif %}
+</div>

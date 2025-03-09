@@ -1,0 +1,24 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Open AI Responses{% endblock title %}
+
+{% block content %}
+	<div class="container mt-4">
+	{% if debates %}
+		<div class="list-group">
+			{% for debate in debates %}
+				<a href="{% url 'debate_detail' debate.pk %}" class="list-group-item list-group-item-action">
+					<div class="d-flex w-100 justify-content-between">
+						<h5 class="mb-1">Response from {{ debate.ai_response.model }}</h5>
+						<small class="text-muted">{{ debate.ai_response.created_at|date:"Y-m-d" }}</small>
+					</div>
+					<p class="mb-1">Votes for Challenger: {{ debate.challenger_vote_count }} | Votes for Defender: {{ debate.reviewer_vote_count }}</p>
+					<small class="text-muted">{{ debate.ai_response.get_status_display }}</small>
+				</a>
+			{% endfor %}
+		</div>
+	{% else %}
+		<p>No debates found.</p>
+	{% endif %}
+	</div>
+{% endblock content %}
