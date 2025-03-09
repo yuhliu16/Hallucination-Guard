@@ -34,7 +34,7 @@
 					<textarea id="correction" name="correction" class="form-control"
 							  rows="4">{{ ai_response.answer }}</textarea>
 				</div>
-				<p class="grey-info">You'll need to put {{ ai_response.get_first_share }} tokens on hold to submit this review. Your tokens will be unlocked if the review is confirmed without failing a challenge, and you'll receive an extra 30.</p>
+				<p class="grey-info">You'll need to put {{ ai_response.get_first_share }} tokens on hold to submit this review. Your tokens will be unlocked if the review is confirmed without failing a challenge, and you'll receive an extra {{ ai_response.get_first_share }}.</p>
 				<button type="submit" class="btn btn-primary">Submit Review</button>
 			</form>
 		</div>

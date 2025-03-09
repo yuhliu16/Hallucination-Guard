@@ -25,14 +25,18 @@ def airesponse_list(request):
     ai_responses = AIResponse.objects.filter(status='open')
     return render(request, 'core/airesponse_list.html', {'ai_responses': ai_responses})
 
+
 @login_required
 def review_list(request):
     reviews = Review.objects.filter(status='active').exclude(reviewer=request.user).exclude(confirmed_by=request.user)
     return render(request, 'core/review_list.html', {'reviews': reviews})
 
+
 @login_required
 def debate_list(request):
-    debates = Debate.objects.filter(resolved=False).exclude(challenger=request.user).exclude(challenged_review__reviewer=request.user)
+    debates = Debate.objects.filter(resolved=False).exclude(challenger=request.user).exclude(
+        challenged_review__reviewer=request.user).exclude(challenger_vote=request.user).exclude(
+        reviewer_vote=request.user)
     return render(request, 'core/debate_list.html', {'debates': debates})
 
 
@@ -164,4 +168,3 @@ def profile_view(request):
         'my_defended_debates': my_defended_debates,
     }
     return render(request, 'core/profile.html', context)
-
